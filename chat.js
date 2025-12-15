@@ -302,125 +302,150 @@ function pickEcho(userText) {
     render();
   });
 
-  // ========= 语音录制（Safari 优先 audio/mp4） =========
-  let mediaRecorder = null;
-  let chunks = [];
-  let recStartAt = 0;
-  let streamRef = null;
+  // ========= 语音录制（稳定版） =========
+let mediaRecorder = null;
+let chunks = [];
+let recStartAt = 0;
+let streamRef = null;
+let isRecording = false;
+let isStopping = false;
 
-  function pickMimeType() {
-    // Safari：audio/mp4 更稳；Chrome：webm/opus
-    const candidates = [
-      "audio/mp4",
-      "audio/webm;codecs=opus",
-      "audio/webm",
-    ];
-    if (!window.MediaRecorder?.isTypeSupported) return "";
-    for (const t of candidates) {
-      if (MediaRecorder.isTypeSupported(t)) return t;
-    }
-    return "";
+function pickMimeType() {
+  const candidates = [
+    "audio/mp4",                // Safari
+    "audio/webm;codecs=opus",   // Chrome
+    "audio/webm"
+  ];
+  if (!window.MediaRecorder?.isTypeSupported) return "";
+  for (const t of candidates) {
+    if (MediaRecorder.isTypeSupported(t)) return t;
+  }
+  return "";
+}
+
+function setVoiceUI(on) {
+  if (!voiceBtn) return;
+  if (on) {
+    voiceBtn.classList.add("is-recording");
+    voiceBtn.textContent = "松开结束";
+  } else {
+    voiceBtn.classList.remove("is-recording");
+    voiceBtn.textContent = "按住说话";
+  }
+}
+
+async function startRecording() {
+  if (!voiceBtn) return;
+  if (isRecording) return;
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    alert("当前浏览器不支持录音，请使用手机 Safari / Chrome（https）。");
+    return;
   }
 
-  function setVoiceUI(on) {
-    if (!voiceBtn) return;
-    if (on) {
-      voiceBtn.classList.add("is-recording");
-      voiceBtn.textContent = "松开结束";
-    } else {
-      voiceBtn.classList.remove("is-recording");
-      voiceBtn.textContent = "按住说话";
-    }
-  }
+  try {
+    isRecording = true;
+    isStopping = false;
+    chunks = [];
+    recStartAt = Date.now();
 
-  async function startRecording() {
-    if (!voiceBtn) return;
-    if (!navigator.mediaDevices?.getUserMedia) {
-      alert("当前浏览器不支持录音。建议用手机 Safari / Chrome，并确保 https。");
-      return;
-    }
-    if (mediaRecorder && mediaRecorder.state === "recording") return;
+    streamRef = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    try {
-      streamRef = await navigator.mediaDevices.getUserMedia({ audio: true });
-      chunks = [];
-      recStartAt = Date.now();
+    const mimeType = pickMimeType();
+    mediaRecorder = mimeType
+      ? new MediaRecorder(streamRef, { mimeType })
+      : new MediaRecorder(streamRef);
 
-      const mimeType = pickMimeType();
-      mediaRecorder = mimeType ? new MediaRecorder(streamRef, { mimeType }) : new MediaRecorder(streamRef);
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    };
 
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) chunks.push(e.data);
-      };
+    mediaRecorder.onstop = async () => {
+      if (isStopping) return;
+      isStopping = true;
 
-      mediaRecorder.onstop = async () => {
-        const durationMs = Date.now() - recStartAt;
+      const durationMs = Date.now() - recStartAt;
 
-        // 太短就丢弃（像微信）
-        if (durationMs < 450) {
-          cleanupStream();
-          setVoiceUI(false);
-          return;
-        }
-
-        const type = mediaRecorder.mimeType || "audio/mp4";
-        const blob = new Blob(chunks, { type });
-
-        const dataUrl = await blobToDataUrl(blob);
-        addAudio("me", dataUrl, durationMs);
-
-        if (echoToggle.checked) {
-          setTimeout(() => addText("granny", pickEcho()), 450);
-        }
-
-        cleanupStream();
-        setVoiceUI(false);
-      };
-
-      mediaRecorder.start();
-      setVoiceUI(true);
-    } catch (err) {
-      console.warn("录音失败：", err);
-      alert("录音失败：请允许麦克风权限，并确保使用 https 或 localhost 打开网页。");
       cleanupStream();
       setVoiceUI(false);
-    }
-  }
+      isRecording = false;
 
-  function stopRecording() {
-    try {
-      if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
-      else { cleanupStream(); setVoiceUI(false); }
-    } catch { cleanupStream(); setVoiceUI(false); }
-  }
+      // 太短直接丢弃（像微信）
+      if (durationMs < 500) return;
 
-  function cleanupStream() {
-    if (streamRef) {
-      streamRef.getTracks().forEach((t) => t.stop());
-      streamRef = null;
-    }
-    mediaRecorder = null;
-    chunks = [];
-    recStartAt = 0;
-  }
+      const blob = new Blob(chunks, { type: mediaRecorder.mimeType || "audio/mp4" });
+      const dataUrl = await blobToDataUrl(blob);
 
-  function blobToDataUrl(blob) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(String(reader.result || ""));
-      reader.readAsDataURL(blob);
-    });
-  }
+      addAudio("me", dataUrl, durationMs);
 
-  if (voiceBtn) {
-    voiceBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); startRecording(); });
-    window.addEventListener("pointerup", () => stopRecording());
-    window.addEventListener("pointercancel", () => stopRecording());
-    voiceBtn.addEventListener("contextmenu", (e) => e.preventDefault());
+      if (echoToggle.checked) {
+        setTimeout(() => addText("granny", pickEcho()), 450);
+      }
+    };
+
+    mediaRecorder.start();
+    setVoiceUI(true);
+
+  } catch (err) {
+    console.warn("录音失败", err);
+    cleanupStream();
+    isRecording = false;
     setVoiceUI(false);
   }
+}
 
-  render();
+function stopRecording() {
+  if (!isRecording || isStopping) return;
+  try {
+    mediaRecorder?.stop();
+  } catch {
+    cleanupStream();
+    isRecording = false;
+    setVoiceUI(false);
+  }
+}
+
+function cleanupStream() {
+  if (streamRef) {
+    streamRef.getTracks().forEach((t) => t.stop());
+    streamRef = null;
+  }
+  mediaRecorder = null;
+  chunks = [];
+  recStartAt = 0;
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result || ""));
+    reader.readAsDataURL(blob);
+  });
+}
+
+// ✅ 只监听 pointer 事件（防止重复）
+if (voiceBtn) {
+  voiceBtn.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    startRecording();
+  });
+
+  voiceBtn.addEventListener("pointerup", (e) => {
+    e.preventDefault();
+    stopRecording();
+  });
+
+  voiceBtn.addEventListener("pointerleave", () => {
+    stopRecording();
+  });
+
+  voiceBtn.addEventListener("pointercancel", () => {
+    stopRecording();
+  });
+
+  voiceBtn.addEventListener("contextmenu", (e) => e.preventDefault());
+  setVoiceUI(false);
+}
   window.addEventListener("grandma:chat:rerender", () => {
   try { render(); } catch (e) {}
 });
