@@ -1070,3 +1070,4 @@ section[id]{
   font-size: 14px;
   letter-spacing: .5px;
 }
+#voiceBtn { display: none !important; }
