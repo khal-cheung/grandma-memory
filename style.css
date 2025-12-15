@@ -1,0 +1,1072 @@
+/* ===== 全局基础 ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { width: 100%; overflow-x: hidden; }
+
+body{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft Yahei", sans-serif;
+  background-color: #0f2a32;
+  color: #f5f2ec;
+  line-height: 1.7;
+}
+
+/* 统一版心 */
+.container{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+}
+
+/* 顶部导航 */
+.topbar{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  background: rgba(10, 35, 49, 0.92);
+  backdrop-filter: blur(10px);
+  color: #f6f3ec;
+}
+.nav-inner{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px 0;
+}
+.logo-area{ display:flex; align-items:center; gap:10px; }
+.logo-mark{
+  width:32px; height:32px;
+  border-radius:50%;
+  border:2px solid #d5b59b;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:700;
+}
+.logo-main{ font-size:16px; font-weight:700; }
+.logo-sub{ font-size:11px; opacity:.85; }
+.nav-links a{
+  margin-left: 18px;
+  font-size: 13px;
+  text-decoration:none;
+  color:#f6f3ec;
+  opacity:.92;
+}
+.nav-links a:hover{ opacity:1; text-decoration: underline; }
+
+/* 按钮 */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration:none;
+}
+.primary-btn{ background-color:#e6c5aa; color:#1c2832; font-weight:700; }
+.ghost-btn{ border-color:#e6c5aa; color:#f6f3ec; background: transparent; }
+.small-btn{ padding: 7px 12px; font-size: 12px; }
+
+/* Hero */
+.hero{
+  position: relative;
+  min-height: 70vh;
+  display:flex; align-items:center;
+  padding-top: 70px;
+  color:#f6f3ec;
+  background-image: url("https://images.pexels.com/photos/814499/pexels-photo-814499.jpeg?auto=compress&cs=tinysrgb&w=1600");
+  background-size: cover;
+  background-position: center;
+}
+.hero-overlay{
+  position:absolute; inset:0;
+  background: linear-gradient(120deg, rgba(10,35,49,.9), rgba(10,35,49,.72), rgba(10,35,49,.42));
+}
+.hero-content{ position:relative; padding: 64px 0 86px; max-width: 680px; }
+.hero-eyebrow{
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color:#e6c5aa;
+  margin-bottom: 12px;
+}
+.hero-title{ font-size: 32px; line-height: 1.4; margin-bottom: 16px; }
+.hero-subtitle{ font-size: 14px; opacity:.92; margin-bottom: 22px; }
+.hero-actions{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom: 14px; }
+.hero-contact{ font-size: 12px; opacity: .9; }
+.hero-label{ opacity:.8; margin-right:6px; }
+
+/* 通用标题 */
+.section-eyebrow{
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #e6c5aa;
+  margin-bottom: 8px;
+}
+.section-title{ font-size: 26px; margin-bottom: 14px; }
+.section-desc{ font-size: 14px; opacity:.92; margin-bottom: 16px; }
+.muted{ opacity:.75; }
+
+/* 2) Featured */
+.featured-photo{ background-color:#0f2a32; padding: 56px 0; }
+.featured-layout{
+  display:grid;
+  grid-template-columns: 360px 1fr;
+  gap: 36px;
+  align-items:center;
+}
+.featured-photo-link{ text-decoration:none; display:block; }
+.featured-frame{
+  background-color: rgba(0,0,0,.18);
+  border-radius: 12px;
+  padding: 8px;
+  overflow:hidden;
+  box-shadow: 0 18px 40px rgba(0,0,0,.35);
+}
+.featured-img{
+  width:100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 8px;
+  display:block;
+  transform: scale(1);
+  transition: transform 4s ease-out;
+}
+.featured-frame:hover .featured-img{ transform: scale(1.06); }
+.featured-text{ color:#f2f5f6; font-size:14px; }
+.featured-caption{ margin-top:10px; opacity:.9; }
+
+/* 3) 家人留言（本地） */
+.family-section{ background-color:#173843; padding: 56px 0; }
+.family-grid{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 24px;
+  margin-top: 14px;
+}
+.family-card{
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+.family-list-card{ max-height: 520px; overflow:auto; }
+.family-list-title{ font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+
+.form-row{ margin-bottom: 12px; }
+.form-row label{ display:block; font-size: 12px; opacity:.9; margin-bottom: 6px; }
+.form-row input, .form-row textarea{
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.92);
+  color: #24313b;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+}
+.form-row textarea{ min-height: 120px; resize: vertical; }
+
+.form-actions{ display:flex; gap: 10px; flex-wrap:wrap; margin-top: 6px; }
+.hint{ font-size: 12px; opacity:.75; margin-top: 10px; }
+
+.guestbook-empty{
+  font-size: 13px;
+  opacity: .75;
+  line-height: 1.7;
+  padding: 8px 2px;
+}
+.guestbook-item{
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.guestbook-meta{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap: 10px;
+  font-size: 12px;
+  opacity: .85;
+  margin-bottom: 8px;
+}
+.guestbook-text{
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: .96;
+}
+.guestbook-delete{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.35);
+  color: rgba(255,255,255,.9);
+  border-radius: 999px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.guestbook-delete:hover{ background: rgba(0,0,0,.2); }
+
+/* 4) 聊天日记（微信风） */
+.diary-section{ background-color:#112731; padding: 56px 0; }
+
+.chat-diary{
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.chat-header{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(255,255,255,.18);
+  margin-bottom: 12px;
+}
+.chat-header h3{ font-size: 15px; font-weight: 800; }
+.chat-toggle{ font-size: 12px; opacity:.92; display:flex; align-items:center; gap: 8px; }
+.chat-toggle input{ transform: translateY(1px); }
+
+.chat-list{
+  height: 420px;
+  overflow: auto;
+  padding: 4px 2px 10px;
+}
+
+/* 日期分割线（微信风） */
+.chat-day{
+  display:flex;
+  justify-content:center;
+  margin: 10px 0 14px;
+}
+.chat-day span{
+  font-size: 12px;
+  opacity: .78;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* 一条消息：行容器 */
+.chat-msg{
+  display:flex;
+  width: 100%;
+  margin: 8px 0;
+}
+
+/* 你：右侧 */
+.chat-msg.me{ justify-content:flex-end; }
+
+/* 回声：左侧 */
+.chat-msg.granny{ justify-content:flex-start; }
+
+/* 气泡：关键 —— 不再“扁大一块”，而是随文字自适应 */
+.chat-bubble{
+  display: inline-block;
+  width: fit-content;
+  max-width: min(72%, 520px);
+  padding: 10px 12px;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.22);
+}
+
+/* 颜色：微信感 */
+.chat-msg.me .chat-bubble{
+  background: #9fe39b;         /* 绿色 */
+  color: #1c2832;
+  border-top-right-radius: 6px;
+}
+.chat-msg.granny .chat-bubble{
+  background: rgba(255,255,255,.92); /* 白色 */
+  color: #1c2832;
+  border-top-left-radius: 6px;
+}
+
+.chat-text{ font-size: 14px; line-height: 1.65; word-break: break-word; }
+.chat-meta{
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: .75;
+  display:flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.chat-who{ white-space: nowrap; }
+.chat-time{ white-space: nowrap; }
+
+.chat-empty{
+  font-size: 13px;
+  opacity: .78;
+  padding: 10px 6px;
+}
+
+.chat-input-area{
+  display:flex;
+  gap: 10px;
+  align-items:flex-end;
+  margin-top: 12px;
+}
+.chat-input-area textarea{
+  width: 100%;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.92);
+  color: #24313b;
+  font-family: inherit;
+  font-size: 14px;
+  min-height: 44px;
+  resize: vertical;
+}
+.send-btn{ min-width: 84px; padding: 10px 16px; border-radius: 999px; border: none; cursor:pointer; }
+
+.chat-footnote{ margin-top: 10px; font-size: 12px; opacity: .72; }
+
+/* 5) 回忆（长文 + 侧图） */
+.story-section{ background-color:#173843; color:#f5f2ec; padding: 56px 0; }
+.story-inner{
+  display:grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 36px;
+  align-items:start;
+}
+.story-text p{ font-size: 14px; margin-bottom: 10px; opacity:.95; }
+
+.story-side{ position: sticky; top: 110px; text-align:center; }
+.story-image-frame{
+  background: rgba(0,0,0,.18);
+  padding: 10px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+}
+.story-image-frame img{
+  width: 100%;
+  max-width: 280px;
+  border-radius: 10px;
+  display:block;
+  margin: 0 auto;
+}
+.story-side-caption{
+  font-size: 13px;
+  opacity: .78;
+  font-style: italic;
+  line-height: 1.8;
+}
+
+/* 6) 画廊 */
+.gallery-section{
+  background-color:#d38b67;
+  color:#fdf7f1;
+  padding: 56px 0;
+}
+.gallery-layout{
+  display:flex;
+  align-items:flex-start;
+  gap: 28px;
+}
+.gallery-view{
+  flex: 0 0 40%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 8px;
+}
+.gallery-photo-frame{
+  background-color: rgba(0,0,0,.18);
+  border-radius: 12px;
+  padding: 8px;
+  overflow:hidden;
+  max-width: 340px;
+  max-height: 260px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.gallery-photo-frame img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.gallery-arrow{
+  background:none;
+  border: 1px solid rgba(255,255,255,.6);
+  color: #fdf7f1;
+  width: 32px; height: 32px;
+  border-radius: 999px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 18px;
+  opacity:.85;
+}
+.gallery-arrow:hover{ background: rgba(0,0,0,.28); opacity: 1; }
+.gallery-text{ flex: 1; font-size: 14px; }
+.gallery-caption{ margin-top: 10px; font-size: 13px; opacity: .95; }
+
+/* 7) 献花 */
+.flower-wrap{ background-color:#112731; padding: 56px 0; }
+.flower-section{
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 18px;
+  text-align:center;
+}
+.flower-subtitle{ font-size: 13px; opacity:.78; margin: 6px 0 14px; line-height:1.6; }
+.offer-flower-btn{
+  background-color:#e6c5aa;
+  color:#1c2832;
+  border:none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor:pointer;
+  margin-bottom: 10px;
+}
+.flower-count{ font-size: 13px; opacity:.85; margin: 8px 0 10px; }
+.flower-wall{
+  margin-top: 10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap: 6px;
+  justify-content:center;
+  font-size: 18px;
+  line-height: 1;
+}
+.flower-wall span{ opacity:.92; }
+
+/* Legacy & Footer */
+.legacy-section{
+  background: linear-gradient(180deg, #0b1920 0%, #0c1f27 60%, #0c1f27 100%);
+  color:#f2f5f6;
+  text-align:center;
+  padding: 80px 0 90px;
+}
+.legacy-quote{ font-size: 38px; line-height: 1.6; font-weight: 300; margin-bottom: 18px; }
+.legacy-contact{ font-size: 15px; opacity: .75; margin-bottom: 28px; }
+.legacy-divider{ width: 120px; height: 2px; background: rgba(255,255,255,.15); margin: 0 auto 30px; }
+.legacy-title{ font-size: 28px; font-weight: 500; margin-bottom: 6px; }
+.legacy-years{ font-size: 15px; letter-spacing: .22em; opacity: .75; }
+
+.site-footer{ background:#0b151b; color:#a6b1b8; padding: 16px 0 20px; }
+.footer-inner{ display:flex; justify-content: space-between; align-items:center; font-size: 12px; }
+.footer-main{ font-size: 13px; margin-bottom: 3px; }
+
+/* ===== 响应式 ===== */
+@media (max-width: 900px){
+  .featured-layout{ grid-template-columns: 1fr; }
+  .family-grid{ grid-template-columns: 1fr; }
+  .story-inner{ grid-template-columns: 1fr; }
+  .story-side{ position: static; margin-top: 18px; }
+  .gallery-layout{ flex-direction: column; }
+  .gallery-view{ width: 100%; }
+  .gallery-photo-frame{ max-width: 100%; max-height: 320px; }
+  .chat-list{ height: 380px; }
+}
+@media (max-width: 640px){
+  .nav-inner{ flex-direction: column; align-items: flex-start; }
+  .nav-links{ margin-top: 6px; }
+  .nav-links a{ margin-left: 0; margin-right: 12px; }
+  .hero-title{ font-size: 26px; }
+  .chat-input-area{ flex-direction: column; align-items: stretch; }
+  .send-btn{ width: 100%; }
+  .chat-bubble{ max-width: 92%; }
+}
+/* 我和奶奶的回忆：左滚右定 */
+.story-inner {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 48px;
+  align-items: start;
+}
+
+/* 左侧文字区域 */
+.story-text {
+  max-height: 520px;          /* 控制整体高度 */
+}
+
+/* 文字滚动 */
+.story-text-scroll {
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 12px;
+  line-height: 1.9;
+}
+
+/* 滚动条（可选，比较温柔） */
+.story-text-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.story-text-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.25);
+  border-radius: 4px;
+}
+
+/* 右侧照片固定 */
+.story-side {
+  position: sticky;
+  top: 120px;   /* 滚到这里时开始固定 */
+}
+/* ===== 我和奶奶的回忆：专用布局（防止照片跑掉）===== */
+.memory-section .story-inner{
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 48px;
+  align-items: start;
+}
+
+/* 左侧文字：固定高度 + 可滚动 */
+.memory-section .story-text-scroll{
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 12px;
+  line-height: 1.9;
+}
+
+/* 右侧照片：固定在右边，不跟着文字跑 */
+.memory-section .story-side{
+  position: sticky;
+  top: 120px;
+  align-self: start;
+}
+
+/* 小屏：自动上下 */
+@media (max-width: 900px){
+  .memory-section .story-inner{
+    grid-template-columns: 1fr;
+  }
+  .memory-section .story-side{
+    position: static;
+    margin-top: 24px;
+  }
+}
+/* ===== 放大主照片 + 画廊照片 + 文字往右一点（追加到 style.css 最末尾） ===== */
+
+/* 1) 主照片（首页大照片）放大：左图更宽、图片更高 */
+.featured-layout{
+  grid-template-columns: 420px 1fr; /* 原来更窄的话，这里变宽 */
+  gap: 44px;                        /* 左右更松 */
+}
+.featured-img{
+  height: 320px;                    /* 原来 240 左右的话，这里变大 */
+}
+
+/* 2) 我与奶奶的回忆：文字区往右（增加左内边距），照片固定不动 */
+.story-text{
+  padding-left: 18px;               /* 文字整体右移一点 */
+}
+.story-text-scroll{
+  padding-right: 10px;              /* 滚动条旁边留白更舒服 */
+}
+
+/* 3) 照片画廊放大：左侧图片区更宽、框更大、图片更大 */
+.gallery-view{
+  flex: 0 0 48%;                    /* 原来 40% 的话，这里变宽 */
+}
+.gallery-photo-frame{
+  max-width: 520px;                 /* 原来 320 左右的话，这里变大 */
+  max-height: 360px;                /* 原来 240 左右的话，这里变大 */
+}
+.gallery-photo-frame img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 4) 画廊文字也稍微往右（和你想要的“右侧一点”一致） */
+.gallery-text{
+  padding-left: 12px;
+}
+
+/* 5) 响应式兜底：小屏不要太大，自动缩回 */
+@media (max-width: 900px){
+  .featured-layout{ grid-template-columns: 1fr; }
+  .featured-img{ height: 260px; }
+  .gallery-view{ flex: 1 1 auto; }
+  .gallery-photo-frame{ max-width: 100%; max-height: 300px; }
+  .story-text{ padding-left: 0; }
+}
+/* 英文副标题：意大利斜体风格 */
+.section-subtitle {
+  font-style: italic;          /* 关键：斜体 */
+  font-family: "Times New Roman", "Georgia", serif;
+  font-size: 14px;
+  opacity: 0.75;
+  margin: 6px 0 18px;
+  letter-spacing: 0.02em;
+}
+/* =========================
+   Mobile Fix — 首页首屏
+   ========================= */
+@media (max-width: 768px) {
+
+  /* 1. 顶部导航缩紧 */
+  .topbar {
+    padding: 12px 16px;
+  }
+
+  .nav-links {
+    gap: 14px;
+    font-size: 14px;
+  }
+
+  /* 2. 首屏整体高度收紧 */
+  .hero {
+    min-height: auto;
+    padding: 64px 16px 48px;
+  }
+
+  /* 3. 英文副标题 */
+  .hero .section-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  /* 4. 中文主标题 */
+  .hero h1 {
+    font-size: 26px;
+    line-height: 1.35;
+    margin-bottom: 14px;
+  }
+
+  /* 5. 说明文字 */
+  .hero p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  /* 6. 按钮改为竖排 */
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .hero-actions .primary-btn,
+  .hero-actions .ghost-btn {
+    width: 100%;
+    max-width: 260px;
+    text-align: center;
+  }
+
+}
+/* Mobile Fix — 顶部导航遮挡 Hero 标题 */
+@media (max-width: 768px) {
+  /* 导航在手机端更高一些，所以 Hero 需要更大的上内边距 */
+  .hero {
+    padding-top: 140px; /* 你可在 120~160 之间微调 */
+  }
+
+  /* 保险：锚点跳转到 hero 时不会被导航盖住 */
+  #hero {
+    scroll-margin-top: 110px;
+  }
+}
+/* =============== Chat bubble: 像微信一样“随字变宽” =============== */
+.chat-msg{
+  display:flex;
+  margin: 10px 0;
+}
+.chat-msg.me{ justify-content:flex-end; }
+.chat-msg.granny{ justify-content:flex-start; }
+
+.chat-bubble{
+  display:inline-block;
+  width: fit-content;
+  max-width: 72%;
+  padding: 12px 12px 10px;
+  border-radius: 14px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+}
+
+.chat-msg.me .chat-bubble{
+  background: #bfe6a8;   /* 绿色气泡 */
+  color: #24313b;
+  border-top-right-radius: 6px;
+}
+
+.chat-msg.granny .chat-bubble{
+  background: rgba(255,255,255,0.92); /* 白色气泡 */
+  color: #24313b;
+  border-top-left-radius: 6px;
+}
+
+.chat-text{
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.chat-meta{
+  margin-top: 8px;
+  display:flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+/* 日期分割线（微信风） */
+.chat-day{
+  display:flex;
+  justify-content:center;
+  margin: 14px 0 6px;
+}
+.chat-day span{
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  color: rgba(245,242,236,0.85);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* 空状态 */
+.chat-empty{
+  padding: 14px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* =============== 手机端：导航遮挡 Hero 标题 修复 =============== */
+@media (max-width: 640px){
+  /* 顶部导航折行后更高：给 Hero 更大顶部空间 */
+  .hero{ padding-top: 120px; }
+}
+
+/* 点击导航锚点时不被固定导航盖住 */
+section[id]{
+  scroll-margin-top: 120px;
+}
+/* =========================
+   Voice Diary — WeChat style
+========================= */
+.voice-diary{
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+.voice-head{ margin-bottom: 10px; }
+.voice-title{ font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #f5f2ec; }
+.voice-sub{ opacity: .8; font-size: 12px; line-height: 1.5; color: rgba(245,242,236,.85); }
+
+.voice-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom: 12px;
+}
+
+.voice-status{ font-size: 12px; opacity: .85; color: rgba(245,242,236,.85); }
+
+.voice-list{
+  display: grid;
+  gap: 10px;
+}
+
+/* 每条语音：右对齐（像自己发的） */
+.voice-item{
+  display:flex;
+  justify-content:flex-end;
+  align-items:flex-end;
+  gap: 8px;
+}
+
+/* 微信风语音条（会按秒数变长，宽度由 JS 设置） */
+.voice-bubble{
+  appearance:none;
+  -webkit-appearance:none;
+  border: none;
+  cursor: pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+  border-top-right-radius: 6px;
+
+  background: #bfe6a8; /* 你的绿色气泡 */
+  color: #24313b;
+
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+}
+
+.voice-bubble:active{ transform: translateY(1px); }
+
+/* 播放图标 */
+.voice-icon{
+  font-size: 14px;
+  opacity: .9;
+}
+
+/* 秒数 */
+.voice-seconds{
+  font-size: 12px;
+  opacity: .9;
+  white-space: nowrap;
+}
+
+/* 右侧信息（时间/删除） */
+.voice-meta{
+  font-size: 12px;
+  opacity: .75;
+  color: rgba(245,242,236,.85);
+  text-align: right;
+  line-height: 1.4;
+}
+
+.voice-del{
+  cursor:pointer;
+  border: 0;
+  background: transparent;
+  color: rgba(245,242,236,.85);
+  text-decoration: underline;
+  font-size: 12px;
+  padding: 0;
+}
+
+/* 播放中效果 */
+.voice-bubble.playing{
+  filter: brightness(0.98);
+  outline: 2px solid rgba(255,255,255,.20);
+}
+
+/* 小屏：语音条不要太长 */
+@media (max-width: 640px){
+  .voice-bubble{ max-width: 78vw; }
+}
+/* ===== 语音按钮（像微信“按住说话”） ===== */
+.voice-btn{
+  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.08);
+  color: rgba(255,255,255,.9);
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+.voice-btn.is-recording{
+  background: rgba(230, 200, 170, .25);
+  border-color: rgba(230, 200, 170, .6);
+}
+
+/* 让输入区在桌面/手机都更像微信：语音按钮在左，输入框居中，发送在右 */
+.chat-input-area{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+#chatInput{
+  flex: 1;
+  min-height: 44px;
+}
+
+/* ===== 聊天气泡里音频的样式 ===== */
+.chat-audio{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chat-audio button{
+  border: none;
+  background: rgba(0,0,0,.06);
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.chat-audio .dur{
+  opacity: .7;
+  font-size: 12px;
+}
+/* 隐藏底部独立的“给奶奶的语音”模块（只保留聊天里的语音气泡） */
+.voice-box,
+.voice-panel,
+.voice-section,
+#voiceBox,
+#voicePanel,
+#voiceSection {
+  display: none !important;
+}
+/* ===== 彻底隐藏“独立语音模块”和所有残留说明 ===== */
+
+/* 语音独立区域（外层） */
+.voice-box,
+.voice-panel,
+.voice-section,
+#voiceBox,
+#voicePanel,
+#voiceSection {
+  display: none !important;
+}
+
+/* 语音状态文字、提示、记录说明 */
+.voice-hint,
+.voice-status,
+.voice-tip,
+.voice-desc,
+.voice-info,
+.voice-log,
+.voice-record,
+.voice-record-tip,
+.voice-record-status {
+  display: none !important;
+}
+
+/* 输入框下方多余的提示性段落（如果是 p / div） */
+.chat-diary p,
+.chat-diary .hint,
+.chat-diary .muted {
+  display: none;
+}
+/* ===== WeChat-style Voice Button ===== */
+.voice-btn{
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.28);
+  background: rgba(255,255,255,.10);
+  color: rgba(255,255,255,.92);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 14px;
+  border-radius: 14px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform .12s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 108px;
+  justify-content: center;
+}
+
+.voice-btn::before{
+  content: "🎙️";
+  font-size: 16px;
+  opacity: .95;
+}
+
+.voice-btn:hover{
+  background: rgba(255,255,255,.14);
+  border-color: rgba(255,255,255,.36);
+}
+
+.voice-btn:active{
+  transform: translateY(1px) scale(.99);
+}
+
+/* 录音中状态：更像微信的“按住说话 -> 松开结束” */
+.voice-btn.is-recording{
+  background: rgba(22, 163, 74, .92);        /* 绿色 */
+  border-color: rgba(22, 163, 74, .92);
+  color: #0b1a14;
+  box-shadow: 0 10px 24px rgba(22,163,74,.28);
+}
+
+.voice-btn.is-recording::before{
+  content: "●";
+  color: rgba(0,0,0,.70);
+  font-size: 14px;
+  animation: voicePulse 1s infinite ease-in-out;
+}
+
+/* 长按时的轻微“呼吸感” */
+@keyframes voicePulse{
+  0%   { transform: scale(1);   opacity: .55; }
+  50%  { transform: scale(1.25);opacity: 1; }
+  100% { transform: scale(1);   opacity: .55; }
+}
+
+/* 小提示（可选） */
+.voice-hint{
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+}
+/* ===== 微信式语音条（追加到 style.css 最底部） ===== */
+
+.chat-meta { 
+  margin-top: 6px; 
+  font-size: 12px; 
+  opacity: .75;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.chat-audio-el { 
+  display: none; /* 隐藏原生 <audio controls> */
+}
+
+.chat-audio-wrap { 
+  display: flex; 
+  align-items: center;
+}
+
+.chat-audio-bar{
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  max-width: 260px;
+  user-select: none;
+}
+
+/* 右侧“我”的语音条：绿色系 */
+.chat-msg.me .chat-audio-bar{
+  background: rgba(164, 214, 128, .85);
+  color: #0b1b12;
+}
+
+/* 左侧“回声”的语音条：白色系 */
+.chat-msg.granny .chat-audio-bar{
+  background: rgba(255,255,255,.90);
+  color: #111;
+}
+
+.chat-audio-bar .audio-icon{
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: currentColor;
+  opacity: .85;
+  position: relative;
+}
+
+/* 播放中做一个“闪动”效果 */
+.chat-audio-bar.is-playing .audio-icon{
+  animation: audioBlink .8s infinite;
+}
+
+@keyframes audioBlink{
+  0%{ opacity:.35; }
+  50%{ opacity:1; }
+  100%{ opacity:.35; }
+}
+
+.chat-audio-bar .audio-text{
+  font-size: 14px;
+  letter-spacing: .5px;
+}
