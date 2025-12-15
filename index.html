@@ -216,19 +216,17 @@
       <div id="chatList" class="chat-list"></div>
 
       <div class="chat-input-area">
-  <button id="voiceBtn" class="voice-btn" type="button">点一下开始录音</button>
-    <div class="voice-row">
-    <span id="voiceStatus" class="voice-status"></span>
-    <audio id="voicePreview" class="voice-preview" controls style="display:none;"></audio>
- </div>
-  <textarea
-    id="chatInput"
-    placeholder="今天想跟奶奶说点什么？（Enter 发送；Shift+Enter 换行）"
-  ></textarea>
+        <textarea
+          id="chatInput"
+          placeholder="今天想跟奶奶说点什么？（Enter 发送；Shift+Enter 换行）"
+        ></textarea>
 
-  <button id="chatSendBtn" class="primary-btn send-btn" type="button">发送</button>
-</div>
-      <div class="chat-footnote">提示：这是一份本地聊天日记，只有你自己能看到，只会留在你现在使用的手机里。</div>
+        <button id="chatSendBtn" class="primary-btn send-btn" type="button">发送</button>
+      </div>
+
+      <div class="chat-footnote">
+        提示：这是一份本地聊天日记，只有你自己能看到，只会留在你现在使用的手机里。
+      </div>
     </div>
   </div>
 </section>
@@ -446,6 +444,6 @@
 
   renderFlowers();
 </script>
-<script src="./chat.js?v=4"></script>
+<script src="./chat.js?v=20251215-2"></script>
 </body>
 </html>
