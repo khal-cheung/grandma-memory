@@ -1,133 +1,237 @@
-/* voice.js — 点击一次开始录音，再点一次停止（Safari 友好）
-   需要：
-   #voiceBtn
-   #voiceStatus
-   #voicePreview (audio)
+/* voice.js — 稳定版录音（iOS/Android/PC）
+   目标：
+   - iOS 不再卡“正在录音”
+   - 松手/离开按钮/切后台 都能 stop
+   - 防重复点击导致状态错乱
+   - 录音结束后写入 localStorage(grandma_chat_diary_v3)
+   - 写入后触发 window 事件让 chat.js 立即 render（需要 chat.js 加 6 行监听）
 */
 
 (function () {
-  const btn = document.getElementById("voiceBtn");
-  const statusEl = document.getElementById("voiceStatus");
-  const preview = document.getElementById("voicePreview");
+  const CHAT_KEY = "grandma_chat_diary_v3";
+  const voiceBtn = document.getElementById("voiceBtn");
+  if (!voiceBtn) return;
 
-  if (!btn || !statusEl || !preview) {
-    console.warn("[voice.js] 缺少元素：voiceBtn / voiceStatus / voicePreview");
-    return;
-  }
-
-  let stream = null;
+  // --- 状态机 ---
+  let state = "idle"; // idle | requesting | recording | stopping
   let recorder = null;
+  let stream = null;
   let chunks = [];
-  let recording = false;
+  let startAt = 0;
+  let stopGuardTimer = null;
 
-  function setStatus(t) {
-    statusEl.textContent = t || "";
+  const MIN_MS = 450;      // 太短丢弃
+  const MAX_MS = 60_000;   // 最长 60s 自动停
+  const STOP_GUARD = 1500; // iOS 有时 stop 不回调，用 guard 兜底
+
+  function log(...args) { /* console.log("[voice]", ...args); */ }
+
+  function safeId() {
+    try { if (crypto?.randomUUID) return crypto.randomUUID(); } catch {}
+    return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
   }
 
-  function cleanupStream() {
-    if (stream) {
-      stream.getTracks().forEach((t) => t.stop());
-      stream = null;
+  function loadChat() {
+    try {
+      const raw = localStorage.getItem(CHAT_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveChat(list) {
+    localStorage.setItem(CHAT_KEY, JSON.stringify(list));
+  }
+
+  function setBtnUI(mode) {
+    // 不依赖 chat.js 的 setVoiceUI，直接控制按钮
+    if (mode === "recording") {
+      voiceBtn.classList.add("is-recording");
+      voiceBtn.textContent = "松开结束";
+    } else if (mode === "requesting") {
+      voiceBtn.classList.add("is-recording");
+      voiceBtn.textContent = "请求麦克风…";
+    } else {
+      voiceBtn.classList.remove("is-recording");
+      voiceBtn.textContent = "按住说话";
     }
   }
 
   function pickMimeType() {
-    const candidates = [
-      "audio/mp4",                 // Safari 常见
-      "audio/webm;codecs=opus",    // Chrome 常见
-      "audio/webm",
-    ];
-    for (const t of candidates) {
-      if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
+    // iOS Safari: audio/mp4 更稳；Chrome: webm/opus
+    const cand = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"];
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+    for (const t of cand) {
+      if (MediaRecorder.isTypeSupported(t)) return t;
     }
     return "";
   }
 
-  async function start() {
-    if (recording) return;
+  function cleanup() {
+    if (stopGuardTimer) {
+      clearTimeout(stopGuardTimer);
+      stopGuardTimer = null;
+    }
+    if (stream) {
+      try { stream.getTracks().forEach(t => t.stop()); } catch {}
+      stream = null;
+    }
+    recorder = null;
+    chunks = [];
+    startAt = 0;
+    state = "idle";
+    setBtnUI("idle");
+  }
 
-    btn.disabled = true;
+  async function blobToDataUrl(blob) {
+    return await new Promise((resolve) => {
+      const fr = new FileReader();
+      fr.onloadend = () => resolve(String(fr.result || ""));
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  function pushAudioMessage(dataUrl, durationMs) {
+    const list = loadChat();
+    const sec = Math.max(1, Math.round((durationMs || 0) / 1000));
+    list.push({
+      id: safeId(),
+      role: "me",
+      kind: "audio",
+      dataUrl,
+      durationMs: durationMs || 0,
+      durationSec: sec,
+      ts: Date.now()
+    });
+    saveChat(list);
+
+    // 让 chat.js 立刻重绘（方案A需要 chat.js 加监听）
     try {
-      preview.pause();
-      preview.removeAttribute("src");
-      preview.style.display = "none";
+      window.dispatchEvent(new Event("grandma:chat:rerender"));
+    } catch {}
 
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = pickMimeType();
+    // 如果没加监听，也不至于丢；用户手动刷新也能看到
+  }
+
+  // --- 关键：统一 stop（多入口都能触发） ---
+  async function stopRecording(reason) {
+    if (state !== "recording") return;
+    state = "stopping";
+    log("stopRecording:", reason);
+
+    // iOS 有时不会触发 onstop，做一个 guard
+    stopGuardTimer = setTimeout(() => {
+      log("stop guard fired");
+      try {
+        // 强行收尾：如果 recorder 还在，就尝试 stop；否则直接 cleanup
+        if (recorder && recorder.state === "recording") recorder.stop();
+        else cleanup();
+      } catch {
+        cleanup();
+      }
+    }, STOP_GUARD);
+
+    try {
+      if (recorder && recorder.state === "recording") {
+        recorder.stop();
+      } else {
+        cleanup();
+      }
+    } catch {
+      cleanup();
+    }
+  }
+
+  async function startRecording() {
+    if (state !== "idle") return; // 防重复
+    if (!navigator.mediaDevices?.getUserMedia) {
+      alert("当前浏览器不支持录音。建议用手机 Safari / Chrome，并确保 https。");
+      return;
+    }
+
+    state = "requesting";
+    setBtnUI("requesting");
+
+    try {
+      // iOS 建议加一些约束：echoCancellation 等
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+      });
 
       chunks = [];
-      recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      startAt = Date.now();
+
+      const mimeType = pickMimeType();
+      recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
 
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunks.push(e.data);
       };
 
-      recorder.onerror = (e) => {
-        console.error("[voice.js] recorder error:", e);
-        setStatus("录音出错了，请刷新后再试");
-        recording = false;
-        btn.textContent = "点一下开始录音";
-        cleanupStream();
+      recorder.onerror = () => {
+        cleanup();
+        alert("录音出错了。请重试。");
       };
 
-      recorder.onstop = () => {
-        try {
-          const blob = new Blob(chunks, { type: recorder?.mimeType || "audio/webm" });
-          const url = URL.createObjectURL(blob);
+      recorder.onstop = async () => {
+        // 这里是核心：无论任何 stop 入口，只要到 onstop 就结算
+        if (stopGuardTimer) {
+          clearTimeout(stopGuardTimer);
+          stopGuardTimer = null;
+        }
 
-          preview.src = url;
-          preview.style.display = "block";
-          setStatus("录音已停止：可播放预览（本地保存不上传）");
+        const durationMs = Date.now() - startAt;
+        const tooShort = durationMs < MIN_MS;
+
+        try {
+          if (!tooShort) {
+            const type = recorder?.mimeType || "audio/mp4";
+            const blob = new Blob(chunks, { type });
+            const dataUrl = await blobToDataUrl(blob);
+            if (dataUrl) pushAudioMessage(dataUrl, durationMs);
+          }
         } finally {
-          // 关键：停止后释放麦克风，否则会一直“卡录音”
-          cleanupStream();
-          recorder = null;
-          chunks = [];
+          cleanup();
         }
       };
 
       recorder.start();
-      recording = true;
-      btn.textContent = "停止录音";
-      setStatus("正在录音…再次点击停止");
+      state = "recording";
+      setBtnUI("recording");
+
+      // 最长自动停止，防卡死
+      setTimeout(() => stopRecording("max-duration"), MAX_MS);
     } catch (err) {
-      console.error("[voice.js] getUserMedia failed:", err);
-      setStatus("无法打开麦克风：请在浏览器允许麦克风权限");
-      cleanupStream();
-    } finally {
-      btn.disabled = false;
+      cleanup();
+      alert("录音失败：请允许麦克风权限，并确保使用 https 或 localhost 打开网页。");
     }
   }
 
-  function stop() {
-    if (!recording) return;
-
-    recording = false;
-    btn.textContent = "点一下开始录音";
-    setStatus("正在处理录音…");
-
-    try {
-      if (recorder && recorder.state !== "inactive") recorder.stop();
-      else cleanupStream();
-    } catch (e) {
-      console.error("[voice.js] stop error:", e);
-      cleanupStream();
-      setStatus("停止录音失败：请刷新再试");
-    }
-  }
-
-  btn.addEventListener("click", () => {
-    if (!recording) start();
-    else stop();
+  // --- 事件绑定：iOS/PC 都稳 ---
+  // 用 pointer 兼容鼠标 + 触屏
+  voiceBtn.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    // 防 iOS 长按弹菜单
+    startRecording();
   });
 
-  window.addEventListener("beforeunload", () => {
-    try {
-      if (recorder && recorder.state !== "inactive") recorder.stop();
-    } catch {}
-    cleanupStream();
+  // 松手不在按钮上也要停：绑到 window
+  window.addEventListener("pointerup", () => stopRecording("pointerup"), { passive: true });
+  window.addEventListener("pointercancel", () => stopRecording("pointercancel"), { passive: true });
+
+  // iOS 常见：页面切后台/锁屏导致卡住，必须停
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopRecording("hidden");
   });
 
-  btn.textContent = "点一下开始录音";
-  setStatus("");
+  // iOS：滚动/系统手势有时触发 touchend 不到 pointerup，再兜一层 touchend
+  window.addEventListener("touchend", () => stopRecording("touchend"), { passive: true });
+  window.addEventListener("touchcancel", () => stopRecording("touchcancel"), { passive: true });
+
+  // 防止右键/长按菜单
+  voiceBtn.addEventListener("contextmenu", (e) => e.preventDefault());
+
+  // 初始 UI
+  setBtnUI("idle");
 })();

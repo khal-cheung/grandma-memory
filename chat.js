@@ -421,4 +421,7 @@ function pickEcho(userText) {
   }
 
   render();
+  window.addEventListener("grandma:chat:rerender", () => {
+  try { render(); } catch (e) {}
+});
 })();
